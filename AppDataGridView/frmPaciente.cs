@@ -13,13 +13,12 @@ namespace AppDataGridView
     // Formulario para gestionar los pacientes del sistema (agregar, editar, eliminar y ver sus ingresos)
     public partial class frmPaciente : Form
     {
-        // Propiedad pública que recibe la lista de pacientes desde el formulario principal
-        // Esta lista se comparte entre formularios
-        public List<Paciente> Pacientes { get; set; }
+        private DataTableHospital dtHospital;
 
         public frmPaciente()
         {
             InitializeComponent();
+            dtHospital = new DataTableHospital();
         }
 
         private void frmPaciente_Load(object sender, EventArgs e)
@@ -34,23 +33,35 @@ namespace AppDataGridView
             // Limpiamos el DataSource para forzar una actualización completa
             dgvPacientes.DataSource = null;
 
-            // Creamos una lista de objetos anónimos para mostrar en el grid
-            // No mostramos el objeto Paciente directamente para tener control sobre qué columnas mostrar
+            // Obtenemos los datos de pacientes e ingresos de la base de datos
+            DataTable dtPacientes = dtHospital.ObtenerPacientes();
+            DataTable dtIngresos = dtHospital.ObtenerTodosLosIngresos();
+
+            // Creamos una lista para almacenar los datos que se mostrarán en el DataGridView
             List<object> datosPacientes = new List<object>();
 
-            // Recorremos todos los pacientes
-            foreach (Paciente p in Pacientes)
+            // Recorremos cada paciente para contar sus ingresos y preparar los datos
+            foreach (DataRow row in dtPacientes.Rows)
             {
-                // Contamos cuántos ingresos tiene cada paciente
-                int numeroIngresos = p.Ingresos.Count;
+                int idPaciente = Convert.ToInt32(row["id"]);
+                int numeroIngresos = 0;
 
-                // Creamos un objeto anónimo con los datos que queremos mostrar
+                foreach (DataRow ingreso in dtIngresos.Rows)
+                {
+                    // Contamos los ingresos asociados al paciente actual
+                    if (Convert.ToInt32(ingreso["id_paciente"]) == idPaciente)
+                    {
+                        numeroIngresos++;
+                    }
+                }
+
+                // Agregamos un objeto anónimo con los datos del paciente y su número de ingresos
                 datosPacientes.Add(new
                 {
-                    Id = p.Id,
-                    Nombre = p.Nombre,
-                    Apellido = p.Apellido,
-                    Edad = p.Edad,
+                    Id = idPaciente,
+                    Nombre = row["nombre"].ToString(),
+                    Apellido = row["apellido"].ToString(),
+                    Edad = Convert.ToInt32(row["edad"]),
                     Ingresos = numeroIngresos
                 });
             }
@@ -90,23 +101,12 @@ namespace AppDataGridView
                     }
                     else
                     {
-                        // Creamos un nuevo paciente
-                        Paciente nuevoPaciente = new Paciente();
-                        nuevoPaciente.Nombre = txtNombre.Text;
-                        nuevoPaciente.Apellido = txtApellido.Text;
-                        nuevoPaciente.Edad = edad;
-
-                        // Agregamos el paciente a la lista
-                        Pacientes.Add(nuevoPaciente);
-
-                        // Actualizamos el DataGridView
+                        // Agregamos el nuevo paciente a la base de datos
+                        dtHospital.AgregarPaciente(txtNombre.Text, txtApellido.Text, edad);
                         RefrescarGrid();
-
-                        // Limpiamos los campos para poder agregar otro paciente
                         txtNombre.Clear();
                         txtApellido.Clear();
                         txtEdad.Clear();
-
                         // Mostramos mensaje de confirmación
                         MessageBox.Show("Paciente agregado correctamente.");
                     }
@@ -156,21 +156,7 @@ namespace AppDataGridView
                     {
                         // Obtenemos el ID del paciente seleccionado en el DataGridView
                         int idSeleccionado = (int)dgvPacientes.CurrentRow.Cells["Id"].Value;
-
-                        // Buscamos el paciente en la lista por su ID
-                        foreach (Paciente p in Pacientes)
-                        {
-                            if (p.Id == idSeleccionado)
-                            {
-                                // Actualizamos los datos del paciente
-                                p.Nombre = txtNombre.Text;
-                                p.Apellido = txtApellido.Text;
-                                p.Edad = edad;
-                                break; 
-                                // Salimos del bucle
-                            }
-                        }
-
+                        dtHospital.EditarPaciente(idSeleccionado, txtNombre.Text, txtApellido.Text, edad);
                         // Actualizamos el DataGridView
                         RefrescarGrid();
 
@@ -197,43 +183,27 @@ namespace AppDataGridView
             {
                 // Obtenemos el ID del paciente seleccionado
                 int idSeleccionado = (int)dgvPacientes.CurrentRow.Cells["Id"].Value;
-                Paciente pacienteAEliminar = null;
+                string nombre = dgvPacientes.CurrentRow.Cells["Nombre"].Value.ToString();
+                string apellido = dgvPacientes.CurrentRow.Cells["Apellido"].Value.ToString();
 
-                // Buscamos el paciente en la lista por su ID
-                foreach (Paciente p in Pacientes)
+                // Pedimos confirmación al usuario
+                DialogResult resultado = MessageBox.Show(
+                    "¿Está seguro de eliminar al paciente " + nombre + " " + apellido + "?",
+                    "Confirmar eliminación",
+                    MessageBoxButtons.YesNo);
+
+                // Si el usuario confirmó la eliminación
+                if (resultado == DialogResult.Yes)
                 {
-                    if (p.Id == idSeleccionado)
-                    {
-                        pacienteAEliminar = p;
-                        break;
-                    }
-                }
+                    dtHospital.EliminarPaciente(idSeleccionado);
+                    // Actualizamos el DataGridView
+                    RefrescarGrid();
 
-                // Si encontramos el paciente
-                if (pacienteAEliminar != null)
-                {
-                    // Pedimos confirmación al usuario
-                    DialogResult resultado = MessageBox.Show(
-                        "¿Está seguro de eliminar al paciente " + pacienteAEliminar.Nombre + " " + pacienteAEliminar.Apellido + "?",
-                        "Confirmar eliminación",
-                        MessageBoxButtons.YesNo);
-
-                    // Si el usuario confirmó la eliminación
-                    if (resultado == DialogResult.Yes)
-                    {
-                        // Eliminamos el paciente de la lista
-                        Pacientes.Remove(pacienteAEliminar);
-
-                        // Actualizamos el DataGridView
-                        RefrescarGrid();
-
-                        // Mostramos mensaje de confirmación
-                        MessageBox.Show("Paciente eliminado correctamente.");
-                    }
+                    // Mostramos mensaje de confirmación
+                    MessageBox.Show("Paciente eliminado correctamente.");
                 }
             }
         }
-
         // Evento que se ejecuta cuando cambia la fila seleccionada en el DataGridView
         private void dgvPacientes_SelectionChanged(object sender, EventArgs e)
         {
@@ -258,30 +228,9 @@ namespace AppDataGridView
             {
                 // Obtenemos el ID del paciente seleccionado
                 int idSeleccionado = (int)dgvPacientes.CurrentRow.Cells["Id"].Value;
-                Paciente pacienteSeleccionado = null;
-
-                // Buscamos el paciente en la lista por su ID
-                foreach (Paciente p in Pacientes)
-                {
-                    if (p.Id == idSeleccionado)
-                    {
-                        pacienteSeleccionado = p;
-                        break;
-                    }
-                }
-
-                // Si encontramos el paciente
-                if (pacienteSeleccionado != null)
-                {
-                    // Creamos el formulario de ingresos pasándole el paciente seleccionado
-                    frmIngresos formIngresos = new frmIngresos(pacienteSeleccionado);
-
-                    // Mostramos el formulario como diálogo modal
-                    formIngresos.ShowDialog();
-
-                    // Cuando se cierra el formulario de ingresos, actualizamos el grid
-                    RefrescarGrid();
-                }
+                frmIngresos formIngresos = new frmIngresos(idSeleccionado);
+                formIngresos.ShowDialog();
+                RefrescarGrid();
             }
         }
 

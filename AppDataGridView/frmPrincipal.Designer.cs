@@ -37,6 +37,7 @@
             this.btnEditar = new System.Windows.Forms.Button();
             this.btnEliminar = new System.Windows.Forms.Button();
             this.pnlMenu = new System.Windows.Forms.Panel();
+            this.tableLayoutPanel1 = new System.Windows.Forms.TableLayoutPanel();
             this.toolStrip1 = new System.Windows.Forms.ToolStrip();
             this.tsbHospital = new System.Windows.Forms.ToolStripButton();
             this.tsbPacientes = new System.Windows.Forms.ToolStripButton();
@@ -44,12 +45,11 @@
             this.inicioToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.pacientesToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.lblTituloPrincipal = new System.Windows.Forms.Label();
-            this.tableLayoutPanel1 = new System.Windows.Forms.TableLayoutPanel();
             ((System.ComponentModel.ISupportInitialize)(this.dgvResumen)).BeginInit();
             this.pnlMenu.SuspendLayout();
+            this.tableLayoutPanel1.SuspendLayout();
             this.toolStrip1.SuspendLayout();
             this.menuStrip1.SuspendLayout();
-            this.tableLayoutPanel1.SuspendLayout();
             this.SuspendLayout();
             // 
             // dgvResumen
@@ -137,79 +137,10 @@
             this.pnlMenu.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
             this.pnlMenu.Controls.Add(this.tableLayoutPanel1);
             this.pnlMenu.Dock = System.Windows.Forms.DockStyle.Top;
-            this.pnlMenu.Location = new System.Drawing.Point(0, 219);
+            this.pnlMenu.Location = new System.Drawing.Point(0, 235);
             this.pnlMenu.Name = "pnlMenu";
             this.pnlMenu.Size = new System.Drawing.Size(1656, 174);
             this.pnlMenu.TabIndex = 8;
-            // 
-            // toolStrip1
-            // 
-            this.toolStrip1.ImageScalingSize = new System.Drawing.Size(32, 32);
-            this.toolStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.tsbHospital,
-            this.tsbPacientes});
-            this.toolStrip1.Location = new System.Drawing.Point(0, 40);
-            this.toolStrip1.Name = "toolStrip1";
-            this.toolStrip1.Size = new System.Drawing.Size(1656, 42);
-            this.toolStrip1.TabIndex = 20;
-            this.toolStrip1.Text = "toolStrip1";
-            // 
-            // tsbHospital
-            // 
-            this.tsbHospital.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-            this.tsbHospital.Image = ((System.Drawing.Image)(resources.GetObject("tsbHospital.Image")));
-            this.tsbHospital.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.tsbHospital.Name = "tsbHospital";
-            this.tsbHospital.Size = new System.Drawing.Size(46, 36);
-            this.tsbHospital.Text = "Hospital";
-            // 
-            // tsbPacientes
-            // 
-            this.tsbPacientes.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-            this.tsbPacientes.Image = ((System.Drawing.Image)(resources.GetObject("tsbPacientes.Image")));
-            this.tsbPacientes.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.tsbPacientes.Name = "tsbPacientes";
-            this.tsbPacientes.Size = new System.Drawing.Size(46, 36);
-            this.tsbPacientes.Text = "Pacientes";
-            this.tsbPacientes.Click += new System.EventHandler(this.Pacientes_Click);
-            // 
-            // menuStrip1
-            // 
-            this.menuStrip1.GripMargin = new System.Windows.Forms.Padding(2, 2, 0, 2);
-            this.menuStrip1.ImageScalingSize = new System.Drawing.Size(32, 32);
-            this.menuStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.inicioToolStripMenuItem,
-            this.pacientesToolStripMenuItem});
-            this.menuStrip1.Location = new System.Drawing.Point(0, 0);
-            this.menuStrip1.Name = "menuStrip1";
-            this.menuStrip1.Size = new System.Drawing.Size(1656, 40);
-            this.menuStrip1.TabIndex = 19;
-            this.menuStrip1.Text = "menuStrip1";
-            // 
-            // inicioToolStripMenuItem
-            // 
-            this.inicioToolStripMenuItem.Name = "inicioToolStripMenuItem";
-            this.inicioToolStripMenuItem.Size = new System.Drawing.Size(121, 36);
-            this.inicioToolStripMenuItem.Text = "Hospital";
-            // 
-            // pacientesToolStripMenuItem
-            // 
-            this.pacientesToolStripMenuItem.Name = "pacientesToolStripMenuItem";
-            this.pacientesToolStripMenuItem.Size = new System.Drawing.Size(133, 36);
-            this.pacientesToolStripMenuItem.Text = "Pacientes";
-            this.pacientesToolStripMenuItem.Click += new System.EventHandler(this.Pacientes_Click);
-            // 
-            // lblTituloPrincipal
-            // 
-            this.lblTituloPrincipal.Dock = System.Windows.Forms.DockStyle.Top;
-            this.lblTituloPrincipal.Font = new System.Drawing.Font("Segoe UI", 36F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.lblTituloPrincipal.ForeColor = System.Drawing.SystemColors.ControlDarkDark;
-            this.lblTituloPrincipal.Location = new System.Drawing.Point(0, 82);
-            this.lblTituloPrincipal.Name = "lblTituloPrincipal";
-            this.lblTituloPrincipal.Size = new System.Drawing.Size(1656, 137);
-            this.lblTituloPrincipal.TabIndex = 21;
-            this.lblTituloPrincipal.Text = "Hospital";
-            this.lblTituloPrincipal.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             // 
             // tableLayoutPanel1
             // 
@@ -228,6 +159,75 @@
             this.tableLayoutPanel1.Size = new System.Drawing.Size(1652, 167);
             this.tableLayoutPanel1.TabIndex = 8;
             // 
+            // toolStrip1
+            // 
+            this.toolStrip1.ImageScalingSize = new System.Drawing.Size(32, 32);
+            this.toolStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.tsbHospital,
+            this.tsbPacientes});
+            this.toolStrip1.Location = new System.Drawing.Point(0, 48);
+            this.toolStrip1.Name = "toolStrip1";
+            this.toolStrip1.Size = new System.Drawing.Size(1656, 50);
+            this.toolStrip1.TabIndex = 20;
+            this.toolStrip1.Text = "toolStrip1";
+            // 
+            // tsbHospital
+            // 
+            this.tsbHospital.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+            this.tsbHospital.Image = ((System.Drawing.Image)(resources.GetObject("tsbHospital.Image")));
+            this.tsbHospital.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.tsbHospital.Name = "tsbHospital";
+            this.tsbHospital.Size = new System.Drawing.Size(46, 44);
+            this.tsbHospital.Text = "Hospital";
+            // 
+            // tsbPacientes
+            // 
+            this.tsbPacientes.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+            this.tsbPacientes.Image = ((System.Drawing.Image)(resources.GetObject("tsbPacientes.Image")));
+            this.tsbPacientes.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.tsbPacientes.Name = "tsbPacientes";
+            this.tsbPacientes.Size = new System.Drawing.Size(46, 44);
+            this.tsbPacientes.Text = "Pacientes";
+            this.tsbPacientes.Click += new System.EventHandler(this.Pacientes_Click);
+            // 
+            // menuStrip1
+            // 
+            this.menuStrip1.GripMargin = new System.Windows.Forms.Padding(2, 2, 0, 2);
+            this.menuStrip1.ImageScalingSize = new System.Drawing.Size(32, 32);
+            this.menuStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.inicioToolStripMenuItem,
+            this.pacientesToolStripMenuItem});
+            this.menuStrip1.Location = new System.Drawing.Point(0, 0);
+            this.menuStrip1.Name = "menuStrip1";
+            this.menuStrip1.Size = new System.Drawing.Size(1656, 48);
+            this.menuStrip1.TabIndex = 19;
+            this.menuStrip1.Text = "menuStrip1";
+            // 
+            // inicioToolStripMenuItem
+            // 
+            this.inicioToolStripMenuItem.Name = "inicioToolStripMenuItem";
+            this.inicioToolStripMenuItem.Size = new System.Drawing.Size(121, 40);
+            this.inicioToolStripMenuItem.Text = "Hospital";
+            // 
+            // pacientesToolStripMenuItem
+            // 
+            this.pacientesToolStripMenuItem.Name = "pacientesToolStripMenuItem";
+            this.pacientesToolStripMenuItem.Size = new System.Drawing.Size(133, 40);
+            this.pacientesToolStripMenuItem.Text = "Pacientes";
+            this.pacientesToolStripMenuItem.Click += new System.EventHandler(this.Pacientes_Click);
+            // 
+            // lblTituloPrincipal
+            // 
+            this.lblTituloPrincipal.Dock = System.Windows.Forms.DockStyle.Top;
+            this.lblTituloPrincipal.Font = new System.Drawing.Font("Segoe UI", 36F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.lblTituloPrincipal.ForeColor = System.Drawing.SystemColors.ControlDarkDark;
+            this.lblTituloPrincipal.Location = new System.Drawing.Point(0, 98);
+            this.lblTituloPrincipal.Name = "lblTituloPrincipal";
+            this.lblTituloPrincipal.Size = new System.Drawing.Size(1656, 137);
+            this.lblTituloPrincipal.TabIndex = 21;
+            this.lblTituloPrincipal.Text = "Hospital";
+            this.lblTituloPrincipal.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            // 
             // frmPrincipal
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(12F, 25F);
@@ -245,11 +245,11 @@
             this.Load += new System.EventHandler(this.Form1_Load);
             ((System.ComponentModel.ISupportInitialize)(this.dgvResumen)).EndInit();
             this.pnlMenu.ResumeLayout(false);
+            this.tableLayoutPanel1.ResumeLayout(false);
             this.toolStrip1.ResumeLayout(false);
             this.toolStrip1.PerformLayout();
             this.menuStrip1.ResumeLayout(false);
             this.menuStrip1.PerformLayout();
-            this.tableLayoutPanel1.ResumeLayout(false);
             this.ResumeLayout(false);
             this.PerformLayout();
 

@@ -13,21 +13,21 @@ namespace AppDataGridView
     // Formulario para gestionar los ingresos hospitalarios de un paciente
     public partial class frmIngresos : Form
     {
-        // Variable que guarda el paciente del cual vamos a ver y modificar sus ingresos
-        private Paciente pacienteSeleccionado;
+        // Variable que guarda el id del paciente del cual vamos a ver y modificar sus ingresos
+        private int idPacienteSeleccionado;
+        private DataTableHospital dtHospital;
 
         // Constructor vacío necesario para que funcione el diseñador de Visual Studio
         public frmIngresos()
         {
             InitializeComponent();
+            dtHospital = new DataTableHospital();
         }
-
         // Constructor que recibe un paciente como parámetro
         // El ": this()" llama primero al constructor vacío para inicializar el formulario
-        public frmIngresos(Paciente paciente) : this()          
+        public frmIngresos(int idPaciente) : this()          
         {
-            // Guardamos el paciente que nos pasaron
-            pacienteSeleccionado = paciente;
+            idPacienteSeleccionado = idPaciente;
         }
 
         // Evento que se ejecuta cuando el formulario se carga por primera vez
@@ -42,24 +42,15 @@ namespace AppDataGridView
         {
             // Primero limpiamos el DataSource para que se actualice correctamente
             dgvIngresos.DataSource = null;
-
-            // Si hay un paciente seleccionado, mostramos sus ingresos
-            if (pacienteSeleccionado != null)
-            {
-                dgvIngresos.DataSource = pacienteSeleccionado.Ingresos;
-            }
+            DataTable dtIngresos = dtHospital.ObtenerIngresosPorPaciente(idPacienteSeleccionado);
+            dgvIngresos.DataSource = dtIngresos;
         }
 
         // Evento del botón "Agregar Ingreso"
         private void btnAgregarIngreso_Click(object sender, EventArgs e)
         {
-            // Validamos que haya un paciente seleccionado
-            if (pacienteSeleccionado == null)
-            {
-                MessageBox.Show("No hay un paciente seleccionado.");
-            }
             // Validamos que el campo motivo no esté vacío
-            else if (string.IsNullOrEmpty(txtMotivo.Text))
+            if (string.IsNullOrEmpty(txtMotivo.Text))
             {
                 MessageBox.Show("El motivo es obligatorio.");
             }
@@ -76,38 +67,20 @@ namespace AppDataGridView
             // Si todas las validaciones pasaron, creamos el nuevo ingreso
             else
             {
-                // Creamos un nuevo objeto Ingreso
-                Ingreso nuevoIngreso = new Ingreso();
-                
-                // Asignamos los valores de los controles del formulario al nuevo ingreso
-                nuevoIngreso.FechaIngreso = dtpFechaIngreso.Value;
-                nuevoIngreso.Motivo = txtMotivo.Text;
-                nuevoIngreso.Especialidad = txtEspecialidad.Text;
-                nuevoIngreso.Habitacion = txtHabitacion.Text;
-
-                // Si el checkbox de "Dar Alta" está marcado, guardamos la fecha de alta
+                // Obtenemos los datos del nuevo ingreso desde los controles del formulario
+                DateTime fechaIngreso = dtpFechaIngreso.Value;
+                DateTime? fechaAlta = null;
+                // Si el checkbox de "Dar Alta" está marcado, guardamos la fecha de alta sino sigue en null
                 if (chkDarAlta.Checked)
                 {
-                    nuevoIngreso.FechaAlta = dtpFechaAlta.Value;
+                    fechaAlta = dtpFechaAlta.Value;
                 }
-                // Si no está marcado, la fecha de alta es null (el paciente sigue hospitalizado)
-                else
-                {
-                    nuevoIngreso.FechaAlta = null;
-                }
-
                 // Agregamos el nuevo ingreso a la lista de ingresos del paciente
-                pacienteSeleccionado.Ingresos.Add(nuevoIngreso);
-                
+                dtHospital.AgregarIngreso(fechaIngreso, fechaAlta, txtMotivo.Text, txtEspecialidad.Text, txtHabitacion.Text, idPacienteSeleccionado);
                 // Actualizamos el DataGridView para mostrar el nuevo ingreso
                 RefrescarGridIngresos();
-
                 // Limpiamos los campos del formulario para poder agregar otro ingreso
-                txtMotivo.Clear();
-                txtEspecialidad.Clear();
-                txtHabitacion.Clear();
-                chkDarAlta.Checked = false;
-
+                LimpiarControles();
                 // Mostramos mensaje de confirmación
                 MessageBox.Show("Ingreso agregado correctamente.");
             }
@@ -139,29 +112,21 @@ namespace AppDataGridView
             // Si todas las validaciones pasaron, editamos el ingreso
             else
             {
-                // Obtenemos el ingreso seleccionado en el DataGridView
-                Ingreso ingresoSeleccionado = (Ingreso)dgvIngresos.CurrentRow.DataBoundItem;
-                
-                // Actualizamos los valores del ingreso con los valores de los controles
-                ingresoSeleccionado.FechaIngreso = dtpFechaIngreso.Value;
-                ingresoSeleccionado.Motivo = txtMotivo.Text;
-                ingresoSeleccionado.Especialidad = txtEspecialidad.Text;
-                ingresoSeleccionado.Habitacion = txtHabitacion.Text;
+                // Obtenemos el ingreso seleccionado en el DataGridView y sus datos
+                int idIngreso = (int)dgvIngresos.CurrentRow.Cells["id"].Value;
+                DateTime fechaIngreso = dtpFechaIngreso.Value;
+                DateTime? fechaAlta = null;
 
                 // Si el checkbox de "Dar Alta" está marcado, actualizamos la fecha de alta
                 if (chkDarAlta.Checked)
                 {
-                    ingresoSeleccionado.FechaAlta = dtpFechaAlta.Value;
+                    fechaAlta = dtpFechaAlta.Value;
                 }
-                // Si no está marcado, ponemos la fecha de alta en null
-                else
-                {
-                    ingresoSeleccionado.FechaAlta = null;
-                }
-
+                // Actualizamos el ingreso del paciente si todo es válido
+                dtHospital.EditarIngreso(idIngreso, fechaIngreso, fechaAlta, txtMotivo.Text, txtEspecialidad.Text, txtHabitacion.Text);
                 // Actualizamos el DataGridView para mostrar los cambios
                 RefrescarGridIngresos();
-                
+
                 // Mostramos mensaje de confirmación
                 MessageBox.Show("Ingreso actualizado correctamente.");
             }
@@ -177,27 +142,28 @@ namespace AppDataGridView
             }
             else
             {
-                // Obtenemos el ingreso seleccionado
-                Ingreso ingresoSeleccionado = (Ingreso)dgvIngresos.CurrentRow.DataBoundItem;
+                // Obtenemos el ingreso seleccionado y el motivo
+                int idIngreso = (int)dgvIngresos.CurrentRow.Cells["id"].Value;
+                string motivo = txtMotivo.Text;
 
                 // Mostramos un cuadro de diálogo para confirmar la eliminación
                 DialogResult resultado = MessageBox.Show(
-                    "¿Está seguro de eliminar el ingreso por " + ingresoSeleccionado.Motivo + "?",
+                    "¿Está seguro de eliminar el ingreso por " + motivo + "?",
                     "Confirmar eliminación",
                     MessageBoxButtons.YesNo);
 
                 // Si el usuario confirmó la eliminación
                 if (resultado == DialogResult.Yes)
                 {
-                    // Eliminamos el ingreso de la lista del paciente
-                    pacienteSeleccionado.Ingresos.Remove(ingresoSeleccionado);
-                    
+                    // Eliminamos el ingreso del paciente
+                    dtHospital.EliminarIngreso(idIngreso);
+
                     // Actualizamos el DataGridView
                     RefrescarGridIngresos();
-                    
+
                     // Limpiamos los controles del formulario
                     LimpiarControles();
-                
+
                     // Mostramos mensaje de confirmación
                     MessageBox.Show("Ingreso eliminado correctamente.");
                 }
@@ -207,28 +173,29 @@ namespace AppDataGridView
         // Evento que se ejecuta cuando cambia la fila seleccionada en el DataGridView
         private void dgvIngresos_SelectionChanged(object sender, EventArgs e)
         {
-            // Obtenemos la lista de ingresos del DataSource
-            var ingresos = dgvIngresos.DataSource as List<Ingreso>;
 
-            // Verificamos que haya una fila seleccionada, que tenga datos y que la lista no esté vacía
-            if (ingresos != null && ingresos.Count > 0 && dgvIngresos.CurrentRow != null && dgvIngresos.CurrentRow.DataBoundItem != null)
+            // Guardamos el DataTable asociado al DataGridView
+            DataTable dt = dgvIngresos.DataSource as DataTable;
+
+            // Verificamos que el DataTable no sea nulo y tenga filas, y que haya una fila seleccionada
+            if (dt != null && dt.Rows.Count > 0 && dgvIngresos.CurrentRow != null && dgvIngresos.CurrentRow.DataBoundItem != null)
             {
                 try
                 {
-                    // Obtenemos el ingreso de la fila seleccionada
-                    Ingreso ingreso = (Ingreso)dgvIngresos.CurrentRow.DataBoundItem;
+                    // Como no tenemos ya la clase ingreso, creamos un DataRowView para obtener los datos de la fila seleccionada
+                    // Puede que en un futuro haga las clases para que hagan de modelo y sea más legible el código
+                    DataRowView rowView = (DataRowView)dgvIngresos.CurrentRow.DataBoundItem;
                     
-                    // Cargamos los datos del ingreso en los controles del formulario
-                    dtpFechaIngreso.Value = ingreso.FechaIngreso;
-                    txtMotivo.Text = ingreso.Motivo;
-                    txtEspecialidad.Text = ingreso.Especialidad;
-                    txtHabitacion.Text = ingreso.Habitacion;
+                    dtpFechaIngreso.Value = Convert.ToDateTime(rowView["fecha_ingreso"]);
+                    txtMotivo.Text = rowView["motivo"].ToString();
+                    txtEspecialidad.Text = rowView["especialidad"].ToString();
+                    txtHabitacion.Text = rowView["habitacion"].ToString();
 
                     // Si el ingreso tiene fecha de alta (el paciente fue dado de alta)
-                    if (ingreso.FechaAlta != null)
+                    if (rowView["fecha_alta"] != DBNull.Value)
                     {
                         chkDarAlta.Checked = true;
-                        dtpFechaAlta.Value = ingreso.FechaAlta.Value;
+                        dtpFechaAlta.Value = Convert.ToDateTime(rowView["fecha_alta"]);
                     }
                     // Si no tiene fecha de alta (el paciente sigue hospitalizado)
                     else
@@ -238,7 +205,7 @@ namespace AppDataGridView
                     }
                 }
                 catch (Exception)
-                {
+                { 
                     // Si ocurre algún error (por ejemplo, índice fuera de rango), limpiamos los controles
                     LimpiarControles();
                 }
